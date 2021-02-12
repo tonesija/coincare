@@ -1,0 +1,1 @@
+export default 'BTC,ETH,COMP,CGLD,BAT,FIL,XLM,ALGO'

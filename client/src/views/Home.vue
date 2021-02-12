@@ -1,33 +1,99 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <p v-if="val">{{val}}</p>
+  <div class="view-body">
+
+    <b-table class="mytable"
+        :data="coins"
+        :columns="columns"
+        :checked-rows.sync="checkedCoins"
+        checkable
+        :checkbox-position="'left'"
+        @check="updateGraphData">
+    </b-table>
+
+    <chart :chart-data="chartData"></chart>
+
   </div>
 </template>
 
 <script>
-import TestService from '../services/testService'
+import AssetsService from '../services/assetsService'
+
+import Chart from '../components/Chart'
 export default {
   name: 'Home',
 
   data () {
     return {
-      val: null,
-      url: process.env.VUE_APP_ENV_BASE_URL_DEV
+      coins: [],
+      checkedCoins: [],
+      columns: [
+        {
+          field: 'asset_id',
+          label: 'ID',
+          width: 40
+        },
+        {
+          field: 'name',
+          label: 'Coin name',
+          centered: true
+        },
+        {
+          field: 'price_usd',
+          label: 'Price ($)',
+          numeric: true
+        }
+      ],
+
+      period_id: '1HRS',
+      asset_id_quote: 'USD',
+
+      chartData: {
+        labels: ['Red', 'Green', 'Blue'],
+        datasets: [{
+          label: '# of votes',
+          data: [15, 14, 5]
+        }]
+      },
+
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
     }
   },
 
   methods: {
+    updateGraphData(checkedList) {
+      console.log(checkedList)
+      let labels = []
+      for(let coin of checkedList){
+        labels.push(coin.asset_id)
+      }
+      
+      this.chartData = {
+        labels: labels,
+        datasets: [
+          {
+            label: '# of votes',
+            data: [15, 31, 5]
+          }
+        ]
+      }
+    }
   },
 
   created: async function(){
-        console.log('ee', this.url)
-
-    this.val = await TestService.test(this.apikey)
+    this.coins = (await AssetsService.getAssets()).data
   },
 
   components: {
-    
+    Chart
   }
 }
 </script>
+
+<style scoped>
+  .mytable {
+    overflow-x: hidden;
+  }
+</style>
