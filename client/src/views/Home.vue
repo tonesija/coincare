@@ -17,6 +17,7 @@
 
 <script>
 import AssetsService from '../services/assetsService'
+import PricesService from '../services/pricesService'
 
 import Chart from '../components/Chart'
 export default {
@@ -53,31 +54,30 @@ export default {
           label: '# of votes',
           data: [15, 14, 5]
         }]
-      },
-
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
       }
     }
   },
 
   methods: {
-    updateGraphData(checkedList) {
+    async updateGraphData(checkedList) {
       console.log(checkedList)
-      let labels = []
+      let asset_id_bases = []
       for(let coin of checkedList){
-        labels.push(coin.asset_id)
+        asset_id_bases.push(coin.asset_id)
       }
-      
+
+      let mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote,20210212, this.period_id)
+      console.log(await PricesService.getChartData(asset_id_bases, this.asset_id_quote,20210212, this.period_id))
+      console.log(mapOfData)
+      let datasets = []
+      for(let key in mapOfData){
+        console.log(key)
+        datasets.push({label: key,
+        data: mapOfData[key]})
+      } 
       this.chartData = {
-        labels: labels,
-        datasets: [
-          {
-            label: '# of votes',
-            data: [15, 31, 5]
-          }
-        ]
+        labels: asset_id_bases,
+        datasets: datasets
       }
     }
   },
