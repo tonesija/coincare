@@ -8,7 +8,7 @@ function selectFromArray(arr, query){
 
 //-----COLORS-----
 let colorIndex = 0
-const COLORS = ['#3D348B' , '#7678ed', '#f7b801', '#f18701', '#f35b04']
+const COLORS = ['#3D348B44' , '#7678ed44', '#f7b80144', '#f1870144', '#f35b0444']
 function getColor(){
     colorIndex++
     if(colorIndex == COLORS.length + 1)

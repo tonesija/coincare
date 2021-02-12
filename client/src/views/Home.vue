@@ -1,7 +1,7 @@
 <template>
   <div class="view-body">
 
-    <b-table class="mytable"
+    <b-table
         :data="coins"
         :columns="columns"
         :checked-rows.sync="checkedCoins"
@@ -10,7 +10,37 @@
         @check="updateGraphData">
     </b-table>
 
-    <chart :chart-data="chartData"></chart>
+    <b-field grouped group-multiline>
+      <b-field label="Time period">
+        <b-select v-model="period_id" @input="onSelect">
+            <option value="1MIN">1MIN</option>
+            <option value="5MIN">5MIN</option>
+            <option value="30MIN">30MIN</option>
+            <option value="1HRS">1HRS</option>
+            <option value="2HRS">2HRS</option>
+            <option value="1DAY">1DAY</option>
+        </b-select>
+      </b-field>
+
+      <b-field label="Quote">
+        <b-select v-model="asset_id_quote">
+            <option value="USD">USD</option>
+        </b-select>        
+      </b-field> 
+
+      <b-field label="By trade">
+        <b-select v-model="graphQuery" @input="onSelect">
+            <option value="price_close">Last trade</option>
+            <option value="price_open">First trade</option>
+            <option value="price_low">Lowest trade</option>
+            <option value="price_high">Highest trade</option>
+        </b-select>
+      </b-field>
+    </b-field>
+
+    <chart :chart-data="chartData"
+      :height="200">
+    </chart>
 
   </div>
 </template>
@@ -53,17 +83,19 @@ export default {
       graphQuery: 'price_close',
 
       chartData: {
-        labels: ['Red', 'Green', 'Blue'],
-        datasets: [{
-          label: '# of votes',
-          data: [15, 14, 5]
-        }]
+        labels: [],
+        datasets: []
       }
     }
   },
 
   methods: {
+    onSelect() {
+      this.updateGraphData(null)
+    },
+
     async updateGraphData(checkedList) {
+      if(!checkedList) checkedList = this.checkedCoins
       console.log('Updating graph', checkedList)
       let asset_id_bases = []
       for(let coin of checkedList){
@@ -84,7 +116,7 @@ export default {
       }
 
       let labels = []
-      for(let val of mapOfData[tmpKey]){
+      if(tmpKey) for(let val of mapOfData[tmpKey]){
         let date = new Date(val.time_period_start)
         labels.push(Utility.getTime(date, 'hours'))
       }
@@ -106,7 +138,5 @@ export default {
 </script>
 
 <style scoped>
-  .mytable {
-    overflow-x: hidden;
-  }
+ 
 </style>
