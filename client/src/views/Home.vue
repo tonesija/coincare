@@ -19,6 +19,8 @@
 import AssetsService from '../services/assetsService'
 import PricesService from '../services/pricesService'
 
+import Utility from '../utility/utilityFunctions'
+
 import Chart from '../components/Chart'
 export default {
   name: 'Home',
@@ -48,6 +50,8 @@ export default {
       period_id: '1HRS',
       asset_id_quote: 'USD',
 
+      graphQuery: 'price_close',
+
       chartData: {
         labels: ['Red', 'Green', 'Blue'],
         datasets: [{
@@ -60,23 +64,32 @@ export default {
 
   methods: {
     async updateGraphData(checkedList) {
-      console.log(checkedList)
+      console.log('Updating graph', checkedList)
       let asset_id_bases = []
       for(let coin of checkedList){
         asset_id_bases.push(coin.asset_id)
       }
 
       let mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote,20210212, this.period_id)
-      console.log(await PricesService.getChartData(asset_id_bases, this.asset_id_quote,20210212, this.period_id))
-      console.log(mapOfData)
+      
       let datasets = []
+      let tmpKey
       for(let key in mapOfData){
-        console.log(key)
+        let data = Utility.selectFromArray(mapOfData[key], this.graphQuery)
+        console.log('data: ', mapOfData[key])
         datasets.push({label: key,
-        data: mapOfData[key]})
-      } 
+          backgroundColor: Utility.getColor(),
+          data: data})
+        tmpKey = key
+      }
+
+      let labels = []
+      for(let val of mapOfData[tmpKey]){
+        let date = new Date(val.time_period_start)
+        labels.push(Utility.getTime(date, 'hours'))
+      }
       this.chartData = {
-        labels: asset_id_bases,
+        labels: labels,
         datasets: datasets
       }
     }
