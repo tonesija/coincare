@@ -16,7 +16,7 @@ export default {
             date.setTime( date.getTime() - date.getTimezoneOffset() * 60 * 1000 ); //1 hour offset fix
 
             let data = (await api().get(url, {params: {period_id: period_id,
-                time_start: time_start, time_end: date.toISOString(), limit: 1000,
+                time_start: time_start, time_end: date.toISOString(), limit: process.env.VUE_APP_ENV_LIMIT,
                 apikey: process.env.VUE_APP_ENV_APIKEY}})).data
             console.log('data: ', data)
             toReturn[asset_id_base] = toReturn[asset_id_base].concat(data)

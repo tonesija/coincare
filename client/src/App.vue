@@ -13,6 +13,9 @@
               <b-navbar-item tag="router-link" :to="{path: '/all-assets'}">
                   All assets
               </b-navbar-item>
+              <b-navbar-item tag="router-link" :to="{path: '/correlation'}">
+                  Correlation calculator
+              </b-navbar-item>
               <b-navbar-item tag="router-link" :to="{path: '/discussion'}">
                   Discussion
               </b-navbar-item>

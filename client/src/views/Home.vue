@@ -36,6 +36,28 @@
             <option value="price_high">Highest trade</option>
         </b-select>
       </b-field>
+
+      <b-field label="Starting time:">
+        <b-field>
+          <b-datepicker
+              @input="onSelect"
+              placeholder="Type or select a date..."
+              icon="calendar-today"
+              editable
+              v-model="starting_date">
+          </b-datepicker>
+        </b-field>
+        <b-field>
+          <b-timepicker
+              rounded
+              @input="onSelect"
+              placeholder="Click to select..."
+              icon="clock"
+              :enable-seconds="false"
+              v-model="starting_time">
+          </b-timepicker>
+        </b-field>
+      </b-field>
     </b-field>
 
     <chart :chart-data="chartData"
@@ -79,13 +101,17 @@ export default {
 
       period_id: '1HRS',
       asset_id_quote: 'USD',
+      starting_time: null,
+      starting_date: null,
 
       graphQuery: 'price_close',
 
       chartData: {
         labels: [],
         datasets: []
-      }
+      },
+
+      errorMessage: null
     }
   },
 
@@ -95,6 +121,7 @@ export default {
     },
 
     async updateGraphData(checkedList) {
+
       if(!checkedList) checkedList = this.checkedCoins
       console.log('Updating graph', checkedList)
       let asset_id_bases = []
@@ -102,8 +129,15 @@ export default {
         asset_id_bases.push(coin.asset_id)
       }
 
-      let start_time = new Date( '2021-02-14 00:00' );
-      let mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote, start_time.toISOString(), this.period_id)
+      let start_time = new Date( '2021-02-14 00:00' )
+      Utility.updateDate(start_time, this.starting_date, this.starting_time)
+
+      let mapOfData
+      try{
+        mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote, start_time.toISOString(), this.period_id)
+      } catch(e){
+        this.errorMessage = e
+      }
       
       let datasets = []
       let tmpKey
@@ -130,6 +164,7 @@ export default {
 
   created: async function(){
     this.coins = (await AssetsService.getAssets()).data
+    this.starting_date = Utility.getTodayAtMidnight()
   },
 
   components: {

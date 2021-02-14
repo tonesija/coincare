@@ -23,6 +23,31 @@ function getTime(date){
     return newDate.toLocaleString()
 }
 
+function updateDate(date, newDate, newTime){
+    console.log('New time: ', newTime)
+    console.log('New date: ', newDate)
+    if(newDate){
+        date.setUTCFullYear(newDate.getUTCFullYear())
+        date.setUTCMonth(newDate.getUTCMonth())
+        date.setUTCDate(newDate.getUTCDate())
+    }
+    if(newTime){
+        date.setHours(newTime.getHours())
+        date.setMinutes(newTime.getMinutes())
+    }
+}
+
+function getTodayAtMidnight(){
+    let date = new Date()
+    date.setHours(0)
+    date.setMinutes(0)
+    date.setSeconds(0)
+    date.setMilliseconds(0)
+    return date
+}
+
 exports.selectFromArray = selectFromArray
 exports.getColor = getColor
 exports.getTime = getTime
+exports.updateDate = updateDate
+exports.getTodayAtMidnight = getTodayAtMidnight
