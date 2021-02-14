@@ -102,7 +102,8 @@ export default {
         asset_id_bases.push(coin.asset_id)
       }
 
-      let mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote,20210212, this.period_id)
+      let start_time = new Date( '2021-02-14 00:00' );
+      let mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote, start_time.toISOString(), this.period_id)
       
       let datasets = []
       let tmpKey

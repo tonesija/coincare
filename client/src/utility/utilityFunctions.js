@@ -18,17 +18,9 @@ function getColor(){
 
 //-----DATES-----
 //options moze biti years, months, days, hours, minutes
-function getTime(date, options){
-    let toReturn = ''
-    switch(options){
-        case 'hours': {
-            toReturn += date.getUTCHours() +
-                ':' + date.getUTCMinutes()
-            return toReturn
-        }
-        default: return null
-    }
-
+function getTime(date){
+    let newDate = new Date(date)
+    return newDate.toLocaleString()
 }
 
 exports.selectFromArray = selectFromArray
