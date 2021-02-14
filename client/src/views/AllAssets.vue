@@ -9,7 +9,8 @@
         :default-sort-direction="'asc'"
         narrowed
         striped
-        hoverable>
+        hoverable
+        @click="rowClicked">
 
       <b-table-column field="asset_id" label="ID" sortable searchable width="240">
           <template
@@ -43,7 +44,7 @@
       </b-table-column>
 
       <b-table-column field="price_usd" label="Price" sortable numeric v-slot="props">
-          <span class="">
+          <span class="" v-if="props.row.price_usd">
               {{ props.row.price_usd.toFixed(2) }} $
           </span>
       </b-table-column>
@@ -91,6 +92,9 @@ export default {
   },
 
   methods: {
+    rowClicked(row) {
+      this.$router.push('/all-assets/' + row.asset_id)
+    }
   },
 
   created: async function(){

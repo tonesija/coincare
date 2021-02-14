@@ -59,6 +59,7 @@
 }
 
 .view-body{
-  padding: 7%
+  padding-left: 7%;
+  padding-right: 7%;
 }
 </style>

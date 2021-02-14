@@ -1,14 +1,5 @@
 <template>
   <div class="view-body">
-    
-    <b-table
-        :data="coins"
-        :columns="columns"
-        :checked-rows.sync="checkedCoins"
-        checkable
-        :checkbox-position="'left'"
-        @check="updateGraphData">
-    </b-table>
 
     <section class="section">
     <b-field grouped group-multiline>
@@ -77,29 +68,11 @@ import Utility from '../utility/utilityFunctions'
 
 import Chart from '../components/Chart'
 export default {
-  name: 'Home',
+  name: 'CoinView',
 
   data () {
     return {
-      coins: [],
-      checkedCoins: [],
-      columns: [
-        {
-          field: 'asset_id',
-          label: 'ID',
-          width: 40
-        },
-        {
-          field: 'name',
-          label: 'Coin name',
-          centered: true
-        },
-        {
-          field: 'price_usd',
-          label: 'Price ($)',
-          numeric: true
-        }
-      ],
+      coin: {},
 
       period_id: '1HRS',
       asset_id_quote: 'USD',
@@ -119,44 +92,37 @@ export default {
 
   methods: {
     onSelect() {
-      this.updateGraphData(null)
+      this.updateGraphData()
     },
-
-    async updateGraphData(checkedList) {
-
-      if(!checkedList) checkedList = this.checkedCoins
-      console.log('Updating graph', checkedList)
-      let asset_id_bases = []
-      for(let coin of checkedList){
-        asset_id_bases.push(coin.asset_id)
-      }
+    async updateGraphData(){
+      let asset_id = this.$route.params.asset_id
 
       let start_time = new Date( '2021-02-14 00:00' )
       Utility.updateDate(start_time, this.starting_date, this.starting_time)
 
-      let mapOfData
-      try{
-        mapOfData = await PricesService.getChartData(asset_id_bases, this.asset_id_quote, start_time.toISOString(), this.period_id)
-      } catch(e){
+
+      let data
+      let datasets = []
+      let labels = []
+      try {
+        data = await PricesService.getOneChartData(asset_id, this.asset_id_quote, start_time.toISOString(), this.period_id)
+        
+        for(let val of data){
+          let date = new Date(val.time_period_start)
+          labels.push(Utility.getTime(date, 'hours'))
+        }
+
+        data = Utility.selectFromArray(data, this.graphQuery)
+        console.log(data)
+      } catch(e) {
         this.errorMessage = e
       }
+      datasets.push({
+        label: asset_id,
+        backgroundColor: Utility.getColor(),
+        data: data
+      })
       
-      let datasets = []
-      let tmpKey
-      for(let key in mapOfData){
-        let data = Utility.selectFromArray(mapOfData[key], this.graphQuery)
-        console.log('data: ', mapOfData[key])
-        datasets.push({label: key,
-          backgroundColor: Utility.getColor(),
-          data: data})
-        tmpKey = key
-      }
-
-      let labels = []
-      if(tmpKey) for(let val of mapOfData[tmpKey]){
-        let date = new Date(val.time_period_start)
-        labels.push(Utility.getTime(date, 'hours'))
-      }
       this.chartData = {
         labels: labels,
         datasets: datasets
@@ -165,8 +131,9 @@ export default {
   },
 
   created: async function(){
-    this.coins = (await AssetsService.getAssets()).data
+    this.coin = (await AssetsService.getAsset(this.$route.params.asset_id)).data[0]
     this.starting_date = Utility.getTodayAtMidnight()
+    this.updateGraphData()
   },
 
   components: {
@@ -176,5 +143,5 @@ export default {
 </script>
 
 <style scoped>
- 
+
 </style>

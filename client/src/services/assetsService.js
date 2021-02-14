@@ -8,6 +8,10 @@ export default {
 
     getAllAssets () {
         return api().get('v1/assets', {params: {apikey: process.env.VUE_APP_ENV_APIKEY}})
+    },
+
+    getAsset (asset_id) {
+        return api().get('v1/assets/' + asset_id, {params: {apikey: process.env.VUE_APP_ENV_APIKEY}})
     }
 }
 
